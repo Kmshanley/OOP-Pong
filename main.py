@@ -1,7 +1,7 @@
 import pygame, sys
 import pygame.freetype
 from pygame.locals import *
-import puck, ball
+#import puck, ball
 
 pygame.init()
 fps = pygame.time.Clock()
@@ -9,16 +9,21 @@ fps = pygame.time.Clock()
 # Define some colors
 BLACK = (0,0,0)
 WHITE = (255,255,255)
+RED = (255,0,0)
  
 # Open a new window
 size = (700, 700)
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Pong")
-defaultFont = pygame.freetype.SysFont("Copperplate", 24)
+menuFont = pygame.freetype.SysFont("Copperplate", 40)
 
 selected = True
 cursor = 0
 gameMode = -99
+textSpacing = 30
+opt1, opt1Bound = menuFont.render("AI", fgcolor=WHITE)
+opt2, opt2Bound = menuFont.render("Local", fgcolor=WHITE)
+opt3, opt3Bound = menuFont.render("Online", fgcolor=WHITE)
 while selected:
     for event in pygame.event.get(): # User did something
         if event.type == pygame.QUIT: # If user clicked close
@@ -38,8 +43,22 @@ while selected:
             selected = False
             gameMode = cursor
 
+    
+
     screen.fill(BLACK)
-    defaultFont.render_to(screen, (350, 350), "Hello World!", WHITE)
+    startx = (screen.get_width() - (opt1.get_width() + opt2.get_width() + opt3.get_width() + 30)) / 2
+    starty = opt1.get_height() / 2 + screen.get_height() / 2
+    screen.blit(opt1, (startx, starty))
+    screen.blit(opt2, (startx + opt1.get_width() + textSpacing, starty))
+    screen.blit(opt3, (startx + opt1.get_width() + opt2.get_width() + textSpacing * 2, starty))
+
+    if cursor == -1:
+        pygame.draw.rect(screen, RED, pygame.Rect(startx, starty, opt1.get_width(), opt1.get_height()),  2)
+    if cursor == 0:
+        pygame.draw.rect(screen, RED, pygame.Rect(startx + opt1.get_width() + textSpacing, starty, opt2.get_width(), opt2.get_height()),  2)
+    if cursor == 1:
+        pygame.draw.rect(screen, RED, pygame.Rect(startx + opt1.get_width() + opt2.get_width() + textSpacing*2, starty, opt3.get_width(), opt3.get_height()),  2)
+
     pygame.display.update()
     fps.tick(60)
  
