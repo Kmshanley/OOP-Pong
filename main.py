@@ -2,57 +2,65 @@ import pygame, sys
 import pygame.freetype 
 from pygame.locals import *
 from ball import ball
+from puck import puck
 # Define some colors
 BLACK = (0,0,0)
 WHITE = (255,255,255)
 RED = (255,0,0)
+
 class Pong:
-    def __init__(self):
+    def __init__(self):                 #intializing all values
         self._running = True
-        self._display_surf = None
         self.size = self.weight, self.height = 640, 400
         self.cursor = 0
         self.gameMode = -99
         self.textSpacing = 30
-        self.selected = True
-    def on_init(self):
+        self.selected = False
+    def on_init(self):                  #all pygame initializations 
         pygame.init()
         pygame.display.set_caption("Pong")
         self.fps = pygame.time.Clock()
         self.menuFont = pygame.freetype.SysFont("Copperplate", 40)
         self.screen = pygame.display.set_mode(self.size)
-        self._running = True
         self.opt1, self.opt1Bound = self.menuFont.render("AI", fgcolor=WHITE)
         self.opt2, self.opt2Bound = self.menuFont.render("Local", fgcolor=WHITE)
         self.opt3, self.opt3Bound = self.menuFont.render("Online", fgcolor=WHITE)
         self.startx = (self.screen.get_width() - (self.opt1.get_width() + self.opt2.get_width() + self.opt3.get_width() + 30)) / 2
         self.starty = self.opt1.get_height() / 2 + self.screen.get_height() / 2
         self.ballObj = ball()
-    def on_event(self, event):
+        self.puckObj = puck()
+    def on_event(self, event):          #event based logic for all possible cases
         if event.type == pygame.QUIT:
             self._running = False
-        if event.type == KEYDOWN:
-            if event.key == pygame.K_LEFT or event.key == ord('a'):
-                if self.cursor == -1:
-                    self.cursor = 1
-                elif self.cursor == 1:
-                    self.cursor = 0
-                else:
-                    self.cursor = -1
-            if event.key == pygame.K_RIGHT or event.key == ord('d'):
-                if self.cursor == -1:
-                    self.cursor = 0
-                elif self.cursor == 1:
-                    self.cursor = -1
-                else:
-                    self.cursor = 1
-            if event.type == K_RETURN:
-                self.selected = False
-                self.gameMode = self.cursor
-    def on_loop(self):
+        if self.gameMode == -99:
+            if event.type == KEYDOWN:
+                if event.key == pygame.K_LEFT or event.key == ord('a'):
+                    if self.cursor == -1:
+                        self.cursor = 1
+                    elif self.cursor == 1:
+                        self.cursor = 0
+                    else:
+                        self.cursor = -1
+                if event.key == pygame.K_RIGHT or event.key == ord('d'):
+                    if self.cursor == -1:
+                        self.cursor = 0
+                    elif self.cursor == 1:
+                        self.cursor = -1
+                    else:
+                        self.cursor = 1
+                if event.type == K_RETURN:
+                    self.selected = True
+                    self.gameMode = self.cursor
+        elif self.cursor == -1:     #selected gameMode = AI
+            pass
+        if self.cursor == 0:        #selected gameMode = Local
+            pass
+        elif self.cursor == 1:      #selected gameMode = Online
+            pass
+    def on_loop(self):              #
         pass
-    def on_render(self):
-        if (self.selected):
+    def on_render(self):            #
+        if (~self.selected):
             self.render_menu()
         pygame.display.update()
         self.fps.tick(60)
@@ -75,7 +83,8 @@ class Pong:
 
     def render_menu(self):
         self.screen.fill(BLACK)
-        self.ballObj.draw(self.screen, (self.screen.get_width(),self.screen.get_height()))
+        self.ballObj.draw(self.screen, (self.screen.get_width(), self.screen.get_height()))
+        self.puckObj.draw(self.screen, (self.screen.get_width(), self.screen.get_height()))
         self.screen.blit(self.opt1, (self.startx, self.starty))
         self.screen.blit(self.opt2, (self.startx + self.opt1.get_width() + self.textSpacing, self.starty))
         self.screen.blit(self.opt3, (self.startx + self.opt1.get_width() + self.opt2.get_width() + self.textSpacing * 2, self.starty))
