@@ -2,14 +2,27 @@ import pygame.sprite
 import pygame.surface
 
 class puck(pygame.sprite.Sprite):
-    def __init__(self, character = 'standardPuck.png', pos = (10,10)):
+    def __init__(self, side, character = 'standardPuck.png'):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.transform.scale(pygame.image.load(character), (10,100))
-        self.pos = pos
+        self.side = side
+        self.ypos = 0
+        self.yposTarget = 0
         self.speed = 7
 
-    def draw(self, screen, size):
-        screen.blit(self.image, self.pos)
-        self.pos = (self.pos[0], self.pos[1] + self.speed)
-        if(int(self.pos[1]) >  int(size[1]-90) or int(self.pos[1]) < int(0)):
-            self.speed = self.speed * -1
+    def draw(self, screen):
+        if self.yposTarget > self.ypos:
+            self.ypos += 1
+        elif self.yposTarget < self.ypos:
+            self.ypos -= 1
+            
+        if self.side:
+            screen.blit(self.image, (10, self.ypos))
+        else:
+            screen.blit(self.image, (screen.get_width(), self.ypos))
+
+    def move(self, direction):
+        if direction:
+            self.yposTarget -= self.speed
+        else:
+            self.yposTarget += self.speed
