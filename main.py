@@ -124,6 +124,7 @@ class Pong():
             b.update(self.screen)
 
 
+
     def on_execute(self):
         while(self._running ):
             for event in pygame.event.get(): # User did something
@@ -144,12 +145,16 @@ class AIPong(Pong):
             self._running = False
         if event.type == KEYDOWN:
             keys = pygame.key.get_pressed()
-            if keys[ord('s')]:
+            if (keys[ord('s')] or keys[pygame.K_DOWN]):
                 self.playerPuck.move(False)
-            if keys[ord('w')]:
+            if (keys[ord('w')] or keys[pygame.K_UP]):
                 self.playerPuck.move(True)
             if keys[pygame.K_RETURN]:
                 pass
+
+    def on_loop(self):
+        super().on_loop()
+        self.AIPuck.update(self.ballObj)
 
 
 class LocalPong(Pong):

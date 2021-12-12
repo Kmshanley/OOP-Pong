@@ -27,5 +27,8 @@ class AIpuck(puck):
     def __init__(self, side, character = 'standardPuck.png', xend = 0):
         super().__init__(side, character, xend)
 
-    def update(self):
-        pass
+    def update(self, ball):
+        if (ball.rect[1] > self.rect[1] + self.speed/2):
+            self.move(0)
+        elif (ball.rect[1] < self.rect[1] - self.speed/2):
+            self.move(1)
