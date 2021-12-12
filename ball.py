@@ -1,18 +1,34 @@
 import pygame.sprite
 import pygame.surface
+import pygame.mask
+from random import randint
 
 class ball(pygame.sprite.Sprite):
     def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
+        super().__init__()
         self.image = pygame.transform.scale(pygame.image.load('ball.png'), (15,15))
-        self.pos = (150,300)
-        self.speed = 5
+        self.rect = (randint(0,300),randint(0,300))
+        self.speedBase = 5
+        self.mask = pygame.mask.from_surface(self.image)
+        self.rect = self.image.get_rect()
+        self.speed = [self.speedBase,self.speedBase] #speed in x,y direction
 
-    def draw(self, screen, size):
-        screen.blit(self.image, self.pos)
-        self.pos = (self.pos[0] + self.speed, self.pos[1])
-        if(int(self.pos[0]) >  int(size[0]-15) or int(self.pos[0]) < int(0)):
-            self.speed = self.speed * -1
+    def update(self, screen):
+        self.rect = (self.rect[0] + self.speed[0], self.rect[1] + self.speed[1])
+
+        if((self.rect[0] >  screen.get_width() -15) or int(self.rect[0]) < int(0)):
+            self.bounceX()
+
+        if (self.rect[1] < 0 or self.rect[1] > screen.get_height()):
+            self.bounceY()
 
     def speedUp(self, newSpeed):
         self.speed = newSpeed
+        
+    def bounceX(self):
+        self.speed[0] = -self.speed[0]
+        #self.speed[1] = randint(-self.speedBase, self.speedBase)
+
+    def bounceY(self):
+        self.speed[1] = -self.speed[1]
+        #self.speed[0] = randint(-self.speedBase, self.speedBase)

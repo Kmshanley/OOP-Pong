@@ -1,28 +1,31 @@
 import pygame.sprite
 import pygame.surface
+import pygame.mask
 
 class puck(pygame.sprite.Sprite):
-    def __init__(self, side, character = 'standardPuck.png'):
-        pygame.sprite.Sprite.__init__(self)
+    def __init__(self, side, character = 'standardPuck.png', xend = 0):
+        super().__init__()
         self.image = pygame.transform.scale(pygame.image.load(character), (10,100))
         self.side = side
-        self.ypos = 0
-        self.yposTarget = 0
-        self.speed = 7
+        self.speed = 70
+        self.mask = pygame.mask.from_surface(self.image)
+        self.rect = self.image.get_rect()
 
-    def draw(self, screen):
-        if self.yposTarget > self.ypos:
-            self.ypos += 1
-        elif self.yposTarget < self.ypos:
-            self.ypos -= 1
-            
         if self.side:
-            screen.blit(self.image, (10, self.ypos))
+            self.rect[0] = 10
         else:
-            screen.blit(self.image, (screen.get_width(), self.ypos))
+            self.rect[0] = xend - 10 - self.image.get_width()
 
     def move(self, direction):
         if direction:
-            self.yposTarget -= self.speed
+            self.rect[1] -= self.speed
         else:
-            self.yposTarget += self.speed
+            self.rect[1] += self.speed
+
+
+class AIpuck(puck):
+    def __init__(self, side, character = 'standardPuck.png', xend = 0):
+        super().__init__(side, character, xend)
+
+    def update(self):
+        pass

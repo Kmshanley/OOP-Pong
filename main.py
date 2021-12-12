@@ -2,7 +2,8 @@ import pygame, sys
 import pygame.freetype 
 from pygame.locals import *
 from ball import ball
-from puck import puck
+from puck import puck, AIpuck
+from terrain import terrain
 # Define some colors
 BLACK = (0,0,0)
 WHITE = (255,255,255)
@@ -84,22 +85,45 @@ class PongMainMenu:
 class AIPong:
     def __init__(self):                 #intializing all values
         self._running = True
-        self.size = self.weight, self.height = 640, 400
+        self.size = self.width, self.height = 1200, 800
         self.fps = pygame.time.Clock()
         self.screen = pygame.display.set_mode(self.size)
         self.ballObj = ball()
         self.playerPuck = puck(1)
-        self.AIPuck = puck(0)
+        self.AIPuck = AIpuck(0, xend=self.width)
+        self.niceTerrain = terrain((int(self.width / 2),self.height), (int(self.width * 0.25), 0))
+
+        self.pucks = list()
+        self.balls = list()
+
+        self.all_sprites = pygame.sprite.Group()
+
+        self.balls.append(self.ballObj)
+        self.pucks.append(self.playerPuck)
+        self.pucks.append(self.AIPuck)
+
+        self.all_sprites.add(self.ballObj)
+        self.all_sprites.add(self.playerPuck)
+        self.all_sprites.add(self.AIPuck)
+        self.all_sprites.add(self.niceTerrain)
 
     def on_render(self):
         self.screen.fill(BLACK) 
-        self.playerPuck.draw(self.screen)
-        self.AIPuck.draw(self.screen)
+        self.all_sprites.draw(self.screen)
         pygame.display.update()
         self.fps.tick(60)
 
-    def on_loop(self):              #
-        pass
+    def on_loop(self):              
+        for b in self.balls:
+            for p in self.pucks:
+                if pygame.sprite.collide_mask(b, p):
+                    b.bounceX()
+                    print("Collision")
+        if pygame.sprite.collide_mask(self.ballObj, self.niceTerrain):
+            b.bounceX()
+
+        for b in self.balls:
+            b.update(self.screen)
 
     def on_event(self, event):          #event based logic for all possible cases
         if event.type == pygame.QUIT:
@@ -116,8 +140,9 @@ class AIPong:
         while(self._running ):
             for event in pygame.event.get(): # User did something
                 self.on_event(event)
-            self.on_render()
             self.on_loop()
+            self.on_render() #render should be last
+            
 
 if __name__ == "__main__" :
     pygame.init()
