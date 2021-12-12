@@ -12,7 +12,7 @@ RED = (255,0,0)
 class PongMainMenu:
     def __init__(self):                 #intializing all values
         self._running = True
-        self.size = self.weight, self.height = 640, 400
+        self.size = self.weight, self.height = 1200, 800
         self.cursor = 0
         self.gameMode = -99
         self.textSpacing = 30
@@ -82,7 +82,7 @@ class PongMainMenu:
         if self.cursor == 1:
             pygame.draw.rect(self.screen, RED, pygame.Rect(self.startx + self.opt1.get_width() + self.opt2.get_width() + self.textSpacing*2, self.starty, self.opt3.get_width(), self.opt3.get_height()),  2)
 
-class AIPong:
+class Pong():
     def __init__(self):                 #intializing all values
         self._running = True
         self.size = self.width, self.height = 1200, 800
@@ -90,9 +90,6 @@ class AIPong:
         self.screen = pygame.display.set_mode(self.size)
         self.ballObj = ball()
         self.playerPuck = puck(1)
-        self.AIPuck = AIpuck(0, xend=self.width)
-        self.niceTerrain = terrain((int(self.width / 2),self.height), (int(self.width * 0.25), 0))
-
         self.pucks = list()
         self.balls = list()
 
@@ -100,12 +97,13 @@ class AIPong:
 
         self.balls.append(self.ballObj)
         self.pucks.append(self.playerPuck)
-        self.pucks.append(self.AIPuck)
+        self.niceTerrain = terrain((int(self.width / 2),self.height), (int(self.width * 0.25), 0))
 
+        
         self.all_sprites.add(self.ballObj)
         self.all_sprites.add(self.playerPuck)
-        self.all_sprites.add(self.AIPuck)
         self.all_sprites.add(self.niceTerrain)
+
 
     def on_render(self):
         self.screen.fill(BLACK) 
@@ -118,23 +116,13 @@ class AIPong:
             for p in self.pucks:
                 if pygame.sprite.collide_mask(b, p):
                     b.bounceX()
-                    print("Collision")
+                    #print("Collision")
         if pygame.sprite.collide_mask(self.ballObj, self.niceTerrain):
             b.bounceX()
 
         for b in self.balls:
             b.update(self.screen)
 
-    def on_event(self, event):          #event based logic for all possible cases
-        if event.type == pygame.QUIT:
-            self._running = False
-        if event.type == KEYDOWN:
-            if event.key == pygame.K_DOWN or event.key == ord('s'):
-                self.playerPuck.move(False)
-            if event.key == pygame.K_UP or event.key == ord('w'):
-                self.playerPuck.move(True)
-            if event.key == pygame.K_RETURN:
-                pass
 
     def on_execute(self):
         while(self._running ):
@@ -142,7 +130,52 @@ class AIPong:
                 self.on_event(event)
             self.on_loop()
             self.on_render() #render should be last
-            
+
+
+class AIPong(Pong):
+    def __init__(self):                 #intializing all values
+        super().__init__()
+        self.AIPuck = AIpuck(0, xend=self.width)
+        self.pucks.append(self.AIPuck)
+        self.all_sprites.add(self.AIPuck)
+
+    def on_event(self, event):          #event based logic for all possible cases
+        if event.type == pygame.QUIT:
+            self._running = False
+        if event.type == KEYDOWN:
+            keys = pygame.key.get_pressed()
+            if keys[ord('s')]:
+                self.playerPuck.move(False)
+            if keys[ord('w')]:
+                self.playerPuck.move(True)
+            if keys[pygame.K_RETURN]:
+                pass
+
+
+class LocalPong(Pong):
+    def __init__(self):                 #intializing all values
+        super().__init__()
+        self.playerPuck2 = puck(0, xend = self.width)
+        self.pucks.append(self.playerPuck2)
+        self.all_sprites.add(self.playerPuck2)
+
+    def on_event(self, event):          #event based logic for all possible cases
+        if event.type == pygame.QUIT:
+            self._running = False
+        if event.type == KEYDOWN:
+            keys = pygame.key.get_pressed()     #returns and places bools of all keys pressed
+            if keys[ord('s')]:
+                self.playerPuck.move(False)
+            if keys[ord('w')]:
+                self.playerPuck.move(True)
+
+            if keys[pygame.K_DOWN]:
+                self.playerPuck2.move(False)
+            if keys[pygame.K_UP]:
+                self.playerPuck2.move(True)
+
+            if keys[pygame.K_RETURN]:
+                pass
 
 if __name__ == "__main__" :
     pygame.init()
@@ -154,7 +187,7 @@ if __name__ == "__main__" :
     if (gamemode == -1):
         playPong = AIPong()
     if (gamemode == 0):
-        pass
+        playPong = LocalPong()
     if (gamemode == 1):
         pass
 
