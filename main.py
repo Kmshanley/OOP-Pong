@@ -277,8 +277,13 @@ class LocalPong(Pong):
             if keys[pygame.K_UP]:
                 self.playerPuck2.move(True)
 
-            if keys[pygame.K_RETURN]:
-                pass
+            if keys[pygame.K_SPACE]:
+                if self.playerPuck.ability():
+                    self.newBall = ball()
+                    self.newBall.speedUp((self.newBall.speed[0]/2, self.newBall.speed[1]))
+                    self.balls.append(self.newBall)
+                    self.all_sprites.add(self.newBall)
+
 
 if __name__ == "__main__" :
     pygame.init()
