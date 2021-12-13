@@ -191,7 +191,11 @@ class Pong():
                     #print("pygame.sprite.collide_mask(b, p)")
             if pygame.sprite.collide_mask(b, self.niceTerrain):
                 collisionPoint = pygame.sprite.collide_mask(b, self.niceTerrain)
-                b.bounceX()
+                if (collisionPoint[0] > (collisionPoint[1] * 2) or collisionPoint[1] * 2 > collisionPoint[0]):
+                    b.bounceX()
+                    b.bounceY()
+                else:
+                    b.bounceX()
 
         self.lscore = 0
         self.rscore = 0
