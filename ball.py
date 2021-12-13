@@ -29,7 +29,7 @@ class ball(pygame.sprite.Sprite):
 
         if (self.rect[1] < 0): 
             self.bounceY()
-        if(self.rect[1] > screen.get_height()):
+        if(self.rect[1] > screen.get_height() - 15):
             self.bounceY()
             
 
@@ -38,11 +38,17 @@ class ball(pygame.sprite.Sprite):
         self.speed[1] = newSpeed[1]
         
     def bounceX(self):
-        self.rect = (self.rect[0] - self.speed[0], self.rect[1] - self.speed[1])
+        #self.rect = (self.rect[0] - self.speed[0], self.rect[1] - self.speed[1])
         self.speed[0] = -self.speed[0]
-        self.speed[1] += randint(-1, 1)
+        self.speed[1] += randint(-1, 2)
+
+        if (self.speed[1] > self.speedBase * 5):
+            self.speed[1] -= randint(1,5) 
 
     def bounceY(self):
-        self.rect = (self.rect[0] - self.speed[0], self.rect[1] - self.speed[1])
+        #self.rect = (self.rect[0] - self.speed[0], self.rect[1] - self.speed[1])
         self.speed[1] = -self.speed[1]
         self.speed[0] += randint(-1, 1)
+
+        if (self.speed[0] > self.speedBase * 5):
+            self.speed[0] -= randint(1,5) 

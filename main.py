@@ -19,10 +19,13 @@ class PongMainMenu:
         self.selected = False
         self.fps = pygame.time.Clock()
         self.menuFont = pygame.freetype.SysFont("Copperplate", 40)
+        self.tileFont = pygame.freetype.SysFont("Copperplate", 90)
         self.screen = pygame.display.set_mode(self.size)
         self.opt1, self.opt1Bound = self.menuFont.render("AI", fgcolor=WHITE)
         self.opt2, self.opt2Bound = self.menuFont.render("Local", fgcolor=WHITE)
         self.opt3, self.opt3Bound = self.menuFont.render("Online", fgcolor=WHITE)
+        self.title, self.tileBound = self.menuFont.render("PONG", fgcolor=WHITE)
+        self.title = pygame.transform.smoothscale(self.title, (self.title.get_width() * 5, self.title.get_height() * 5))
         self.startx = (self.screen.get_width() - (self.opt1.get_width() + self.opt2.get_width() + self.opt3.get_width() + 30)) / 2
         self.starty = self.opt1.get_height() / 2 + self.screen.get_height() / 2
 
@@ -75,6 +78,7 @@ class PongMainMenu:
         self.screen.blit(self.opt1, (self.startx, self.starty))
         self.screen.blit(self.opt2, (self.startx + self.opt1.get_width() + self.textSpacing, self.starty))
         self.screen.blit(self.opt3, (self.startx + self.opt1.get_width() + self.opt2.get_width() + self.textSpacing * 2, self.starty))
+        self.screen.blit(self.title, (self.screen.get_width() / 2 - self.title.get_width() / 2, int(self.screen.get_height() * 0.25)))
         if self.cursor == -1:
             pygame.draw.rect(self.screen, RED, pygame.Rect(self.startx, self.starty, self.opt1.get_width(), self.opt1.get_height()),  2)
         if self.cursor == 0:
@@ -203,6 +207,15 @@ class Pong():
             self.rscore += b.rsideHit
             self.lscore += b.lsideHit
             b.update(self.screen)
+
+        if len(self.balls) > 1:
+            for b in self.balls:
+                for a in self.balls:
+                    if b == a:
+                        continue
+                    if pygame.sprite.collide_mask(b,a):
+                        b.bounceX()
+                        a.bounceX()
 
 
 
