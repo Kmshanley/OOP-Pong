@@ -11,24 +11,37 @@ class ball(pygame.sprite.Sprite):
         self.speedBase = 5
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
+        self.rect = (100,100)
         self.speed = [self.speedBase,self.speedBase] #speed in x,y direction
+
+        self.lsideHit = 0
+        self.rsideHit = 0
 
     def update(self, screen):
         self.rect = (self.rect[0] + self.speed[0], self.rect[1] + self.speed[1])
 
-        if((self.rect[0] >  screen.get_width() -15) or int(self.rect[0]) < int(0)):
+        if (self.rect[0] >  screen.get_width() -15):
             self.bounceX()
+            self.rsideHit += 1
+        if (self.rect[0] < 0):
+            self.bounceX()
+            self.lsideHit += 1
 
-        if (self.rect[1] < 0 or self.rect[1] > screen.get_height()):
+        if (self.rect[1] < 0): 
             self.bounceY()
+        if(self.rect[1] > screen.get_height()):
+            self.bounceY()
+            
 
     def speedUp(self, newSpeed):
         self.speed = newSpeed
         
     def bounceX(self):
+        self.rect = (self.rect[0] - self.speed[0], self.rect[1] - self.speed[1])
         self.speed[0] = -self.speed[0]
-        #self.speed[1] = randint(-self.speedBase, self.speedBase)
+        self.speed[1] += randint(-1, 1)
 
     def bounceY(self):
+        self.rect = (self.rect[0] - self.speed[0], self.rect[1] - self.speed[1])
         self.speed[1] = -self.speed[1]
-        #self.speed[0] = randint(-self.speedBase, self.speedBase)
+        self.speed[0] += randint(-1, 1)

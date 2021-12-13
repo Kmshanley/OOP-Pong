@@ -93,12 +93,15 @@ class Pong():
         self.pucks = list()
         self.balls = list()
 
+        self.rscore = 0
+        self.lscore = 0
+
         self.all_sprites = pygame.sprite.Group()
 
         self.balls.append(self.ballObj)
         self.pucks.append(self.playerPuck)
         self.niceTerrain = terrain((int(self.width / 2),self.height), (int(self.width * 0.25), 0))
-
+        self.scoreFont = pygame.freetype.SysFont("Copperplate", 40)
         
         self.all_sprites.add(self.ballObj)
         self.all_sprites.add(self.playerPuck)
@@ -106,8 +109,11 @@ class Pong():
 
 
     def on_render(self):
-        self.screen.fill(BLACK) 
+        self.screen.fill(BLACK)
+        self.scoreFont.render_to(self.screen, (int(self.screen.get_width() * 0.15), 10), str(self.rscore), fgcolor=WHITE)
+        self.scoreFont.render_to(self.screen, (int(self.screen.get_width() * 0.85), 10), str(self.lscore), fgcolor=WHITE)  
         self.all_sprites.draw(self.screen)
+
         pygame.display.update()
         self.fps.tick(60)
 
@@ -116,11 +122,17 @@ class Pong():
             for p in self.pucks:
                 if pygame.sprite.collide_mask(b, p):
                     b.bounceX()
-                    #print("Collision")
-        if pygame.sprite.collide_mask(self.ballObj, self.niceTerrain):
-            b.bounceX()
+                    #print("pygame.sprite.collide_mask(b, p)")
+            if pygame.sprite.collide_mask(b, self.niceTerrain):
+                collisionPoint = pygame.sprite.collide_mask(b, self.niceTerrain)
+                if collisionPoint[0] > b.
+                b.bounceX()
 
+        self.lscore = 0
+        self.rscore = 0
         for b in self.balls:
+            self.rscore += b.rsideHit
+            self.lscore += b.lsideHit
             b.update(self.screen)
 
 
