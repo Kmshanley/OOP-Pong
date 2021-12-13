@@ -17,10 +17,20 @@ class puck(pygame.sprite.Sprite):
             self.rect[0] = xend - 10 - self.image.get_width()
 
     def move(self, direction):
-        if direction:
+        if direction and (self.rect[1]>= self.speed):
             self.rect[1] -= self.speed
-        else:
+        elif ~direction and (self.rect[1] + self.speed < 800 - self.image.get_height()/2):
             self.rect[1] += self.speed
+
+    def ability(self):
+        pass
+
+class DupePuck(puck):
+    def __init__(self, side, character = 'standardPuck.png', xend = 0):
+        super().__init__(side, character, xend)
+
+    def ability(self):
+            return True
 
 
 class AIpuck(puck):

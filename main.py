@@ -2,7 +2,7 @@ import pygame, sys
 import pygame.freetype 
 from pygame.locals import *
 from ball import ball
-from puck import puck, AIpuck
+from puck import puck, AIpuck, DupePuck
 from terrain import terrain
 # Define some colors
 BLACK = (0,0,0)
@@ -82,6 +82,66 @@ class PongMainMenu:
         if self.cursor == 1:
             pygame.draw.rect(self.screen, RED, pygame.Rect(self.startx + self.opt1.get_width() + self.opt2.get_width() + self.textSpacing*2, self.starty, self.opt3.get_width(), self.opt3.get_height()),  2)
 
+
+class PongCharSelect:
+    def __init__(self):                 #intializing all values
+        self._running = True
+        self.size = self.weight, self.height = 1200, 800
+        self.cursor = 1
+        self.character = -99
+        self.textSpacing = 30
+        self.selected = False
+        self.fps = pygame.time.Clock()
+        self.menuFont = pygame.freetype.SysFont("Copperplate", 40)
+        self.screen = pygame.display.set_mode(self.size)
+        self.opt1, self.opt1Bound = self.menuFont.render("Basic", fgcolor=WHITE)
+        self.opt2, self.opt2Bound = self.menuFont.render("Baller", fgcolor=WHITE)
+        self.startx = (self.screen.get_width() - (self.opt1.get_width() + self.opt2.get_width()+ 30)) / 2
+        self.starty = self.opt1.get_height() / 2 + self.screen.get_height() / 2
+
+    def on_event(self, event):          #event based logic for all possible cases
+        if event.type == pygame.QUIT:
+            self._running = False
+        if event.type == KEYDOWN:
+            if event.key == pygame.K_LEFT or event.key == ord('a'):
+                self.cursor = -self.cursor 
+            if event.key == pygame.K_RIGHT or event.key == ord('d'):
+                self.cursor = -self.cursor
+            if event.key == pygame.K_RETURN:
+                self.selected = True
+                self.character = self.cursor
+                
+    def on_render(self):            #
+        if (~self.selected):
+            self.render_menu()
+        pygame.display.update()
+        self.fps.tick(60)
+
+    def on_cleanup(self):
+        pygame.quit()
+        sys.exit()
+
+    def on_execute(self):
+        while(self._running ):
+            for event in pygame.event.get(): # User did something
+                self.on_event(event)
+            self.on_render()
+            if (self.selected):
+                break
+ 
+        return self.character
+        
+    def render_menu(self):
+        self.screen.fill(BLACK)
+        self.screen.blit(self.opt1, (self.startx, self.starty))
+        self.screen.blit(self.opt2, (self.startx + self.opt1.get_width() + self.textSpacing, self.starty))
+        if self.cursor == -1:
+            pygame.draw.rect(self.screen, RED, pygame.Rect(self.startx, self.starty, self.opt1.get_width(), self.opt1.get_height()),  2)
+        if self.cursor == 1:
+            pygame.draw.rect(self.screen, RED, pygame.Rect(self.startx + self.opt1.get_width() + self.textSpacing, self.starty, self.opt2.get_width(), self.opt2.get_height()),  2)
+
+
+
 class Pong():
     def __init__(self):                 #intializing all values
         self._running = True
@@ -89,7 +149,6 @@ class Pong():
         self.fps = pygame.time.Clock()
         self.screen = pygame.display.set_mode(self.size)
         self.ballObj = ball()
-        self.playerPuck = puck(1)
         self.pucks = list()
         self.balls = list()
 
@@ -99,14 +158,21 @@ class Pong():
         self.all_sprites = pygame.sprite.Group()
 
         self.balls.append(self.ballObj)
-        self.pucks.append(self.playerPuck)
         self.niceTerrain = terrain((int(self.width / 2),self.height), (int(self.width * 0.25), 0))
         self.scoreFont = pygame.freetype.SysFont("Copperplate", 40)
         
         self.all_sprites.add(self.ballObj)
-        self.all_sprites.add(self.playerPuck)
         self.all_sprites.add(self.niceTerrain)
 
+    def charBase(self, side):
+        self.playerPuck = puck(1)
+        self.pucks.append(self.playerPuck)
+        self.all_sprites.add(self.playerPuck)
+
+    def charBaller(self, side):
+        self.playerPuck = DupePuck(1)
+        self.pucks.append(self.playerPuck)
+        self.all_sprites.add(self.playerPuck)
 
     def on_render(self):
         self.screen.fill(BLACK)
@@ -125,7 +191,6 @@ class Pong():
                     #print("pygame.sprite.collide_mask(b, p)")
             if pygame.sprite.collide_mask(b, self.niceTerrain):
                 collisionPoint = pygame.sprite.collide_mask(b, self.niceTerrain)
-                if collisionPoint[0] > b.
                 b.bounceX()
 
         self.lscore = 0
@@ -161,8 +226,12 @@ class AIPong(Pong):
                 self.playerPuck.move(False)
             if (keys[ord('w')] or keys[pygame.K_UP]):
                 self.playerPuck.move(True)
-            if keys[pygame.K_RETURN]:
-                pass
+            if keys[pygame.K_SPACE]:
+                if self.playerPuck.ability():
+                    self.newBall = ball()
+                    self.newBall.speedUp((self.newBall.speed[0]/2, self.newBall.speed[1]))
+                    self.balls.append(self.newBall)
+                    self.all_sprites.add(self.newBall)
 
     def on_loop(self):
         super().on_loop()
@@ -200,6 +269,8 @@ if __name__ == "__main__" :
     pygame.key.set_repeat(200) #keys held down sent a event every 100 ms
     playPong = PongMainMenu()
     gamemode = playPong.on_execute() #will block until player selects a gamemode
+    charSelect = PongCharSelect()
+    character = charSelect.on_execute()
 
     if (gamemode == -1):
         playPong = AIPong()
@@ -207,6 +278,11 @@ if __name__ == "__main__" :
         playPong = LocalPong()
     if (gamemode == 1):
         pass
+
+    if (character == -1):
+        playPong.charBase(1)
+    if (character == 1):
+        playPong.charBaller(1)
 
     pygame.key.set_repeat(100) #keys held down sent a event every 100 ms
     playPong.on_execute() #will loop forever

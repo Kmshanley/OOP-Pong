@@ -34,7 +34,8 @@ class ball(pygame.sprite.Sprite):
             
 
     def speedUp(self, newSpeed):
-        self.speed = newSpeed
+        self.speed[0] = newSpeed[0]
+        self.speed[1] = newSpeed[1]
         
     def bounceX(self):
         self.rect = (self.rect[0] - self.speed[0], self.rect[1] - self.speed[1])
